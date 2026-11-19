@@ -1,0 +1,98 @@
+import Link from "next/link";
+import {
+     BookOpen,
+     ClipboardList,
+     Cog,
+     Flag,
+     FolderTree,
+     LayoutDashboard,
+     Users,
+} from "lucide-react";
+import {
+     SidebarContent,
+     SidebarGroup,
+     SidebarGroupContent,
+     SidebarGroupLabel,
+     SidebarMenu,
+     SidebarMenuButton,
+     SidebarMenuItem,
+} from "@/components/ui/sidebar";
+
+const navigationGroups = [
+     {
+          title: "Կառավարում",
+          items: [
+               {
+                    title: "Գլխավոր",
+                    href: "/",
+                    icon: LayoutDashboard,
+               },
+               {
+                    title: "Մասնագիտություններ",
+                    href: "/specialties",
+                    icon: FolderTree,
+               },
+               {
+                    title: "Հարցեր",
+                    href: "/questions",
+                    icon: ClipboardList,
+               },
+               {
+                    title: "Ռեսուրսներ",
+                    href: "/resources",
+                    icon: BookOpen,
+               },
+          ],
+     },
+     {
+          title: "Համակարգ",
+          items: [
+               {
+                    title: "Օգտատերեր",
+                    href: "/users",
+                    icon: Users,
+               },
+               {
+                    title: "Սխալների հաղորդումներ",
+                    href: "/reports",
+                    icon: Flag,
+               },
+               {
+                    title: "Կարգավորումներ",
+                    href: "/settings",
+                    icon: Cog,
+               },
+          ],
+     },
+];
+
+export default function AppSidebarList(){
+     return (
+          <SidebarContent>
+               {navigationGroups.map((group) => (
+                    <SidebarGroup key={group.title}>
+                         <SidebarGroupLabel>
+                              {group.title}
+                         </SidebarGroupLabel>
+                         <SidebarGroupContent>
+                              <SidebarMenu>
+                                   {group.items.map((item) => (
+                                        <SidebarMenuItem key={item.href}>
+                                             <SidebarMenuButton
+                                                  asChild
+                                                  tooltip={item.title}
+                                             >
+                                                  <Link href={item.href}>
+                                                       <item.icon />
+                                                       <span>{item.title}</span>
+                                                  </Link>
+                                             </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                   ))}
+                              </SidebarMenu>
+                         </SidebarGroupContent>
+                    </SidebarGroup>
+               ))}
+          </SidebarContent>
+     )
+}
