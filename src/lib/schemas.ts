@@ -96,3 +96,9 @@ export const resourceSchema = z.object({
      description: z.string().trim(),
      is_published: z.boolean(),
 });
+
+export const sectionSchema = z.object({
+     name_hy: z.string().trim().min(1, "Մուտքագրեք բաժնի անունը։"),
+     specialty_id: z.string().trim().min(1, "Ընտրեք մասնագիտությունը։"),
+     sort_order: z.int32({ error: "Մուտքագրեք թույլատրելի միջակայքում գտնվող ամբողջ թիվ։" }),
+});

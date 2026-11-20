@@ -59,3 +59,44 @@ export async function updateQuestion(id: string, values: QuestionFormValues) {
      if (updated.length === 0) throw new Error("Հարցը չի գտնվել։");
      return updated[0].id;
 }
+export function getQuestions() {
+     return db.select({
+          id: questions.id,
+          number: questions.number,
+          stem: questions.stem,
+          status: questions.status,
+          section: sections.name_hy,
+     }).from(questions).innerJoin(sections, eq(questions.section_id, sections.id)).orderBy(asc(sections.sort_order), asc(questions.number), asc(questions.id));
+}
+
+export async function getQuestionForEdit(id: string): Promise<QuestionFormValues | null> {
+     const [[question], links] = await Promise.all([
+          db.select().from(questions).where(eq(questions.id, id)).limit(1),
+          db.select({ topic_id: questionTopics.topic_id }).from(questionTopics).where(eq(questionTopics.question_id, id)),
+     ]);
+
+     if (!question) return null;
+
+     return {
+          specialty_id: question.specialty_id,
+          section_id: question.section_id,
+          topic_ids: links.map(({ topic_id }) => topic_id),
+          number: question.number,
+          stem: question.stem,
+          options: question.options,
+          correct_option_id: question.correct_option_id,
+          explanation: question.explanation,
+          note: question.note ?? "",
+          sources: question.sources,
+          shuffle: question.shuffle,
+     };
+}
+
+export async function deleteQuestion(id: string) {
+     const [, [deleted]] = await db.batch([
+          db.delete(questionTopics).where(eq(questionTopics.question_id, id)),
+          db.delete(questions).where(eq(questions.id, id)).returning({ id: questions.id }),
+     ]);
+
+     return deleted?.id ?? null;
+}

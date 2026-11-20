@@ -1,11 +1,17 @@
+"use client"
 import HeadingActions from "@/components/admin/header-actions";
+import QuestionsList from "./list";
+import type { getQuestions } from "@/data/question";
 
-export default function QuestionsContent(){
+interface QuestionsContentProps{
+     questions: Awaited<ReturnType<typeof getQuestions>>
+}
+export default function QuestionsContent({questions}: QuestionsContentProps){
      return (
           <div className="space-y-3">
                <h1 className="font-semibold text-xl md:text-2xl lg:text-3xl">Հարցեր</h1>
                <HeadingActions href="/questions/editor"/>
-               <span>TODO: Make each item have a unique view type, unique form page, import/export as JSON & CSV</span>
+               <QuestionsList questions={questions}/>
           </div>
      );
 }

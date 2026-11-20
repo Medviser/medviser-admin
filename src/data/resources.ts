@@ -9,7 +9,7 @@ export const getResourceById = cache(async(id: string) => {
      return resource ?? null;
 })
 export const listResources = cache(async() => {
-     return db.select().from(resources).orderBy(asc(resources.title), asc(resources.id)).limit(25) ?? []
+     return db.select().from(resources).orderBy(asc(resources.title), asc(resources.id)) ?? []
 })
 export const insertResource = async(values: ResourceFormValues) => {
      const [inserted] = await db.insert(resources).values({

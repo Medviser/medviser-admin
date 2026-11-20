@@ -7,6 +7,7 @@ import {
      Flag,
      FolderTree,
      LayoutDashboard,
+     TableOfContents,
      Users,
 } from "lucide-react";
 import {
@@ -34,6 +35,11 @@ const navigationGroups = [
                     title: "Մասնագիտություններ",
                     href: "/specialties",
                     icon: FolderTree,
+               },
+               {
+                    title: "Բաժիններ",
+                    href: "/sections",
+                    icon: TableOfContents
                },
                {
                     title: "Հարցեր",

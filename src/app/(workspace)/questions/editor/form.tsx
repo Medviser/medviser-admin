@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { questionSchema } from "@/lib/schemas";
 import type { QuestionFormValues } from "@/lib/types/schema";
 import { useTransition } from "react";
-import { createQuestion } from "@/actions/questions";
+import { createQuestion, editQuestion } from "@/actions/questions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
@@ -31,6 +31,7 @@ type QuestionsEditorFormProps = {
      sections: SpecialtyOption[];
      topics: SpecialtyOption[];
      initialValues?: QuestionFormValues;
+     questionId?: string
 };
 
 const letters = ["Ա", "Բ", "Գ", "Դ"];
@@ -40,6 +41,7 @@ export default function QuestionsEditorForm({
      sections,
      topics,
      initialValues,
+     questionId
 }: QuestionsEditorFormProps) {
      const router = useRouter();
      const [isSubmitting, startTransition] = useTransition();
@@ -73,7 +75,7 @@ export default function QuestionsEditorForm({
 
      const onSubmit = (values: QuestionFormValues) => {
           startTransition(async() => {
-               const res = await createQuestion(values);
+               const res = questionId ? await editQuestion(questionId, values) : await createQuestion(values);
                if(res.error) {
                     toast.error(res.error);
                     return;

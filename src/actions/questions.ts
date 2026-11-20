@@ -1,7 +1,8 @@
 "use server"
-import { insertQuestion } from "@/data/question";
+import { deleteQuestion, insertQuestion, updateQuestion } from "@/data/question";
 import { questionSchema } from "@/lib/schemas";
 import type { QuestionFormValues } from "@/lib/types/schema";
+import { revalidatePath } from "next/cache";
 
 export async function createQuestion(values: QuestionFormValues){
      const validated = questionSchema.safeParse(values);
@@ -10,7 +11,7 @@ export async function createQuestion(values: QuestionFormValues){
           return {error: "Դաշտերը դեռ անվավեր են"}
      }
 
-     // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
+     
 
      try {
           await insertQuestion(validated.data);
@@ -18,4 +19,42 @@ export async function createQuestion(values: QuestionFormValues){
      } catch {
           return { error: "Չհաջողվեց պահպանել հարցը։ Կրկին փորձեք։" };
      }
+}
+export async function editQuestion(id: string, values: QuestionFormValues) {
+     if (typeof id !== "string" || !id.trim()) {
+          return { error: "Հարցի ID-ն պարտադիր է։" };
+     }
+
+     const parsed = questionSchema.safeParse(values);
+     if (!parsed.success) return { error: "Ստուգեք լրացված դաշտերը։" };
+
+     // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
+
+     try {
+          await updateQuestion(id, parsed.data);
+     } catch {
+          return { error: "Չհաջողվեց պահպանել հարցը։" };
+     }
+
+     revalidatePath("/questions");
+     return { success: true as const };
+}
+
+export async function removeQuestion(id: string) {
+     if (typeof id !== "string" || !id.trim()) {
+          return { error: "Հարցի ID-ն պարտադիր է։" };
+     }
+
+     // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
+
+     try {
+          if (!(await deleteQuestion(id))) {
+               return { error: "Հարցը չի գտնվել։" };
+          }
+     } catch {
+          return { error: "Չհաջողվեց ջնջել հարցը։ Հնարավոր է՝ այն արդեն օգտագործվում է։" };
+     }
+
+     revalidatePath("/questions");
+     return { success: true as const };
 }

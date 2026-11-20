@@ -4,10 +4,11 @@
 import { revalidatePath } from "next/cache";
 import { deleteResource, insertResource, updateResource } from "@/data/resources";
 import { resourceSchema } from "@/lib/schemas";
+import type { ResourceFormValues } from "@/lib/types/schema";
 
 type ResourceResult = { success: true } | { error: string };
 
-export async function createResource(values: unknown): Promise<ResourceResult> {
+export async function createResource(values: ResourceFormValues): Promise<ResourceResult> {
      const parsed = resourceSchema.safeParse(values);
      if (!parsed.success) return { error: "Ստուգեք լրացված դաշտերը։" };
 
@@ -23,7 +24,7 @@ export async function createResource(values: unknown): Promise<ResourceResult> {
      return { success: true };
 }
 
-export async function editResource(id: string, values: unknown): Promise<ResourceResult> {
+export async function editResource(id: string, values: ResourceFormValues): Promise<ResourceResult> {
      if (typeof id !== "string" || !id.trim()) {
           return { error: "Ռեսուրսի ID-ն պարտադիր է։" };
      }

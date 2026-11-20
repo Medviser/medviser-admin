@@ -31,7 +31,7 @@ export const updateSpecialty = async(id: string, values: SpecialtyFormData) => {
      return updated?.id ?? null;
 }
 export const listSpecialties = cache(async() => {
-     return db.select().from(specialties).orderBy(asc(specialties.name_hy), asc(specialties.id)).limit(25) ?? []
+     return db.select().from(specialties).orderBy(asc(specialties.name_hy), asc(specialties.id)) ?? []
 })
 export const deleteSpecialty = async(id: string) => {
      const [deleted] = await db.delete(specialties).where(eq(specialties.id, id)).returning({ id: specialties.id });
