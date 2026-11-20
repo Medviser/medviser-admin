@@ -494,6 +494,14 @@ export const organizationAdmins = pgTable(
     index("organization_admins_user_id_idx_6c952402").on(table.user_id),
   ],
 );
+export const resources = pgTable("resources", {
+  id: cuidPrimaryKey(),
+  title: text().notNull(),
+  url: text().notNull(),
+  description: text(),
+  is_published: boolean().notNull().default(false),
+});
 
+export type Resource = typeof resources.$inferSelect;
 export type Specialty = typeof specialties.$inferSelect;
 export type NewSpecialty = typeof specialties.$inferInsert;

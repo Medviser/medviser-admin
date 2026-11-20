@@ -59,10 +59,9 @@ export default function SpecialtyEditorForm({
                     toast.error(res.error);
                     return;
                }
-               if(res.success) {
-                    form.reset();
-                    router.push("/specialties")
-               }
+
+               toast.success(specialty ? "Մասնագիտությունը պահպանվեց։" : "Մասնագիտությունը ստեղծվեց։");
+               router.push("/specialties")
           })
      }
      return (

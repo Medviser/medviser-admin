@@ -84,3 +84,15 @@ export const questionSchema = z.object({
      path: ["correct_option_id"],
      error: "Ընտրեք նշված տարբերակներից մեկը։",
 });
+
+export const resourceSchema = z.object({
+     title: z.string().trim().min(1, "Մուտքագրեք ռեսուրսի վերնագիրը։"),
+     url: z.string().trim().pipe(
+          z.url({
+               protocol: /^https?$/,
+               error: "Մուտքագրեք վավեր HTTP կամ HTTPS հղում։",
+          }),
+     ),
+     description: z.string().trim(),
+     is_published: z.boolean(),
+});

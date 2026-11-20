@@ -2,6 +2,7 @@
 import { deleteSpecialty, insertSpecialty, updateSpecialty } from "@/data/specialties";
 import { specialtyDataSchema } from "@/lib/schemas";
 import type { SpecialtyFormData } from "@/lib/types/schema";
+import { revalidatePath } from "next/cache";
 
 export async function createSpecialty(values: SpecialtyFormData){
      const validated = specialtyDataSchema.safeParse(values);
@@ -14,10 +15,13 @@ export async function createSpecialty(values: SpecialtyFormData){
 
      try {
           await insertSpecialty(validated.data);
-          return { success: true };
+          
      } catch {
           return { error: "Չհաջողվեց պահպանել մասնագիտությունը։ Կրկին փորձեք։" };
      }
+
+     revalidatePath("/specialties");
+     return { success: true };
 }
 export async function editSpecialty(id: string, values: SpecialtyFormData){
      if (typeof id !== "string" || !id.trim()) {
@@ -32,10 +36,12 @@ export async function editSpecialty(id: string, values: SpecialtyFormData){
 
      try {
           await updateSpecialty(id, validated.data);
-          return { success: true };
      } catch {
           return { error: "Չհաջողվեց պահպանել մասնագիտությունը։ Կրկին փորձեք։" };
      }
+
+     revalidatePath("/specialties");
+     return { success: true };
 }
 export async function removeSpecialty(id: string) {
      if (typeof id !== "string" || !id.trim()) {
