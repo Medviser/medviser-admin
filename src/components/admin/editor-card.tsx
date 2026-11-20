@@ -12,7 +12,7 @@ type Props = {
      title: string;
      detail: string;
      editHref: string;
-     removeAction: () => Promise<{ success: true } | { error: string }>;
+     removeAction: () => Promise<{ success?: boolean, error?: string }>;
      postDelete: (id: string) => void
      id: string
 };
