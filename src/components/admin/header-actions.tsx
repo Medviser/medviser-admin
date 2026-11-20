@@ -2,8 +2,13 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Download, Plus, Search, Upload } from "lucide-react";
+import Link from "next/link";
 
-export default function HeadingActions(){
+interface HeadingActionsProps{
+     href?: string,
+     onCreate?: () => void
+}
+export default function HeadingActions({href, onCreate}: HeadingActionsProps){
      return (
           <div className="flex items-center justify-between gap-2">
                <InputGroup className="bg-background/50 max-w-lg">
@@ -17,10 +22,19 @@ export default function HeadingActions(){
                     <InputGroupAddon align="inline-end">12 արդյունք</InputGroupAddon>
                </InputGroup>
                <div className="flex items-center gap-2 flex-wrap">
-                    <Button variant="outline">
-                         <Plus/>
-                         Ստեղծել
-                    </Button>
+                    {href && href.trim()!=="" ? (
+                         <Button variant="outline" asChild>
+                              <Link href={href}>
+                                   <Plus/>
+                                   Ստեղծել
+                              </Link>
+                         </Button>
+                    ) : (
+                         <Button variant="outline" onClick={onCreate}>
+                              <Plus/>
+                              Ստեղծել
+                         </Button>
+                    )}
                     <ButtonGroup>
                          <Button size="icon" variant="outline" title="Ներմուծել">
                               <Upload/>

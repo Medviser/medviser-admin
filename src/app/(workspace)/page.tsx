@@ -1,4 +1,4 @@
-import HomeContent from "@/contents/content";
+import HomeContent from "@/contents/workspace";
 
 export default function Home() {
      return (

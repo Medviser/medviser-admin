@@ -4,7 +4,7 @@ export default function SpecialtitesContent(){
      return (
           <div className="space-y-3">
                <h1 className="font-semibold text-xl md:text-2xl lg:text-3xl">Մասնագիտություններ</h1>
-               <HeadingActions/>
+               <HeadingActions href="/specialties/editor"/>
                <span>TODO: Make each item have a unique view type, unique form page, import/export as JSON & CSV</span>
           </div>
      );
