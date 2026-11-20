@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import LoginContent from "@/contents/login"
+import LoginContent from "@/contents/workspace"
 
 export const metadata: Metadata = {
      title: "Մուտք"
