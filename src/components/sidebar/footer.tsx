@@ -2,8 +2,9 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SidebarFooter, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { ChevronsUpDown, BadgeCheck, LogOut, Cog } from "lucide-react";
+import { ChevronsUpDown, BadgeCheck, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import Link from "next/link";
 
 export default function AppSidebarFooter(){
      const isMobile = useIsMobile();
@@ -47,21 +48,18 @@ export default function AppSidebarFooter(){
                                         </div>
                                    </DropdownMenuLabel>
                                    <DropdownMenuSeparator />
-                                        <DropdownMenuGroup>
-                                        <DropdownMenuItem>
-                                             <BadgeCheck />
-                                             Հաշիվ
+                                   <DropdownMenuGroup>
+                                        <DropdownMenuItem asChild>
+                                             <Link href="/account">
+                                                  <BadgeCheck />
+                                                  Հաշիվ
+                                             </Link>
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                             <Cog />
-                                             Կարգավորումներ
+                                        <DropdownMenuItem variant="destructive">
+                                             <LogOut />
+                                             Դուրս գալ
                                         </DropdownMenuItem>
-                                        </DropdownMenuGroup>
-                                   <DropdownMenuSeparator />
-                                   <DropdownMenuItem variant="destructive">
-                                        <LogOut />
-                                        Դուրս գալ
-                                   </DropdownMenuItem>
+                                   </DropdownMenuGroup>
                               </DropdownMenuContent>
                          </DropdownMenu>
                     </SidebarMenuItem>

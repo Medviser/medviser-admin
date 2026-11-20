@@ -13,7 +13,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                          <AppSidebarList/>
                          <AppSidebarFooter />
                     </Sidebar>
-                    <main className="min-w-0 flex-1">
+                    <main className="min-w-0 flex-1 bg-linear-to-br from-primary/50 to-background w-full h-dvh p-3">
                          <SidebarTrigger />
                          {children}
                     </main>

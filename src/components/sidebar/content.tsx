@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import {
      BookOpen,
@@ -17,6 +18,8 @@ import {
      SidebarMenuButton,
      SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { usePathname } from "next/navigation";
+import { cn } from "cn";
 
 const navigationGroups = [
      {
@@ -67,6 +70,7 @@ const navigationGroups = [
 ];
 
 export default function AppSidebarList(){
+     const pathName = usePathname()
      return (
           <SidebarContent>
                {navigationGroups.map((group) => (
@@ -76,19 +80,22 @@ export default function AppSidebarList(){
                          </SidebarGroupLabel>
                          <SidebarGroupContent>
                               <SidebarMenu>
-                                   {group.items.map((item) => (
-                                        <SidebarMenuItem key={item.href}>
-                                             <SidebarMenuButton
-                                                  asChild
-                                                  tooltip={item.title}
-                                             >
-                                                  <Link href={item.href}>
-                                                       <item.icon />
-                                                       <span>{item.title}</span>
-                                                  </Link>
-                                             </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                   ))}
+                                   {group.items.map((item) => {
+                                        const matchesPath = pathName===item.href
+                                        return (
+                                             <SidebarMenuItem key={item.href}>
+                                                  <SidebarMenuButton
+                                                       asChild
+                                                       tooltip={item.title}
+                                                  >
+                                                       <Link href={item.href}>
+                                                            <item.icon className={cn(matchesPath && "text-primary")}/>
+                                                            <span className={cn(matchesPath && "font-medium text-primary")}>{item.title}</span>
+                                                       </Link>
+                                                  </SidebarMenuButton>
+                                             </SidebarMenuItem>
+                                        )
+                                   })}
                               </SidebarMenu>
                          </SidebarGroupContent>
                     </SidebarGroup>
