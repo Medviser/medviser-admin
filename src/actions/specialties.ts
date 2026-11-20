@@ -15,7 +15,6 @@ export async function createSpecialty(values: SpecialtyFormData){
 
      try {
           await insertSpecialty(validated.data);
-          
      } catch {
           return { error: "Չհաջողվեց պահպանել մասնագիտությունը։ Կրկին փորձեք։" };
      }
@@ -53,8 +52,9 @@ export async function removeSpecialty(id: string) {
      try {
           const deletedId = await deleteSpecialty(id.trim());
           if (deletedId === null) return { error: "Մասնագիտությունը չի գտնվել։" };
-          return { success: true };
      } catch {
           return { error: "Չհաջողվեց ջնջել մասնագիտությունը։ Կրկին փորձեք։" };
      }
+     revalidatePath("/specialties");
+     return { success: true };
 }

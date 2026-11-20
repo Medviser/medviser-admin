@@ -52,5 +52,5 @@ export async function removeSection(id: string) {
      }
 
      revalidatePath("/sections");
-     return { success: true as const };
+     return { success: true };
 }

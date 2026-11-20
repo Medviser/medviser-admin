@@ -12,10 +12,11 @@ export async function createQuestion(values: QuestionFormValues){
      };
      try {
           await insertQuestion(validated.data);
-          return { success: true };
      } catch {
           return { error: "Չհաջողվեց պահպանել հարցը։ Կրկին փորձեք։" };
      }
+     revalidatePath("/questions");
+     return { success: true };
 }
 export async function editQuestion(id: string, values: QuestionFormValues) {
      if (typeof id !== "string" || !id.trim()) {
@@ -37,7 +38,7 @@ export async function editQuestion(id: string, values: QuestionFormValues) {
      }
 
      revalidatePath("/questions");
-     return { success: true as const };
+     return { success: true };
 }
 
 export async function removeQuestion(id: string) {
@@ -56,5 +57,5 @@ export async function removeQuestion(id: string) {
      }
 
      revalidatePath("/questions");
-     return { success: true as const };
+     return { success: true };
 }
