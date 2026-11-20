@@ -12,19 +12,16 @@ const emailSchema = z.email();
 const phonePattern = /^\+?[0-9]{7,15}$/;
 
 export const loginSchema = z.object({
-     identifier: z.string().trim().refine((value) =>
-          emailSchema.safeParse(value).success || phonePattern.test(value),
-          "Մուտքագրեք վավեր էլ․ փոստի հասցե կամ հեռախոսահամար։",
-     ),
+     identifier: z.string().trim().refine((value) =>emailSchema.safeParse(value).success || phonePattern.test(value),"Մուտքագրեք վավեր էլ․ փոստի հասցե կամ հեռախոսահամար։",),
      password: z.string().min(1, "Մուտքագրեք գաղտնաբառը։").max(8,"Գաղնաբառը 8 նիշից ավել է"),
      rememberMe: z.boolean(),
 });
 
-export const specialtySchema = z.object({
+export const specialtyFields = z.object({
      name_hy: z.string({ error: "Մուտքագրեք մասնագիտության անունը։" }).trim().min(1, "Մուտքագրեք մասնագիտության անունը։"),
      slug: z.string({ error: "Մուտքագրեք հասցեի անվանումը։" }).trim().min(1, "Մուտքագրեք հասցեի անվանումը։").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/,"Օգտագործեք փոքրատառ լատինատառեր, թվեր և դրանց միջև գծիկներ։",),
      sort_order: z.number({ error: "Մուտքագրեք հերթականության համարը։" }).int("Հերթականության համարը պետք է ամբողջ թիվ լինի։").min(-2147483648, "Հերթականության համարը թույլատրելի միջակայքից դուրս է։").max(2147483647, "Հերթականության համարը թույլատրելի միջակայքից դուրս է։"),
-     sponsor_id: z.string({ error: "Ընտրեք հովանավոր։" }).trim().transform((value) =>value === NO_SPONSOR || value === "" ? null : value),
+     sponsor_id: z.string({ error: "Ընտրեք հովանավոր։" }).trim().transform((value) => value === NO_SPONSOR || value === "" ? null : value),
      sponsor_until: sponsorUntilSchema,
      is_published: z.boolean({
           error: "Նշեք հրապարակման կարգավիճակը։",
@@ -36,3 +33,54 @@ export const specialtySchema = z.object({
           error: "Ժամկետ սահմանելու համար նախ ընտրեք հովանավոր։",
      },
 );
+
+const hasSponsorForExpiry = ({sponsor_id,sponsor_until,}: {
+     sponsor_id: string | null;
+     sponsor_until: Date | null;
+}) => sponsor_until === null || sponsor_id !== null;
+
+const sponsorExpiryError = {
+     path: ["sponsor_until"],
+     error: "Ժամկետ սահմանելու համար նախ ընտրեք հովանավոր։",
+};
+
+export const specialtySchema = specialtyFields.refine(
+     hasSponsorForExpiry,
+     sponsorExpiryError,
+);
+export const specialtyDataSchema = z.object({
+     ...specialtyFields.shape,
+     sponsor_id: z.string({ error: "Ընտրեք հովանավոր։" }).trim().min(1, "Ընտրեք հովանավոր։").refine((value) => value !== NO_SPONSOR, "Ընտրեք հովանավոր։").nullable(),
+     sponsor_until: z.date({ error: "Մուտքագրեք վավերական ամսաթիվ և ժամ։" }).nullable(),
+}).refine(hasSponsorForExpiry, sponsorExpiryError);
+
+export const questionSchema = z.object({
+     specialty_id: z.string().min(1, "Ընտրեք մասնագիտությունը։"),
+     section_id: z.string().min(1, "Ընտրեք բաժինը։"),
+     topic_ids: z.array(z.string().min(1)),
+     number: z.number({ error: "Մուտքագրեք հարցի համարը։" }).int("Համարը պետք է ամբողջ թիվ լինի։").min(1, "Համարը պետք է լինի առնվազն 1։").max(2147483647, "Համարը թույլատրելի միջակայքից դուրս է։"),
+     stem: z.string().trim().min(1, "Մուտքագրեք հարցի տեքստը։"),
+     options: z.array(
+          z.object({
+               id: z.string().min(1),
+               text: z.string().trim().min(1, "Լրացրեք տարբերակը։"),
+          })
+     ).length(4, "Հարցը պետք է ունենա չորս տարբերակ։"),
+     correct_option_id: z.string().min(1, "Նշեք ճիշտ պատասխանը։"),
+     explanation: z.string().trim().min(1, "Գրեք պատասխանի հիմնավորումը։"),
+     note: z.string().trim(),
+     sources: z.array(
+          z.object({
+               title: z.string().trim().min(1, "Նշեք աղբյուրի անունը։"),
+               url: z.url({
+                    protocol: /^https?$/,
+                    error: "Մուտքագրեք վավեր HTTP կամ HTTPS հղում։",
+               }),
+          }),
+     ),
+     shuffle: z.boolean(),
+})
+.refine(({ options, correct_option_id }) => correct_option_id === "" || options.some(({ id }) => id === correct_option_id),{
+     path: ["correct_option_id"],
+     error: "Ընտրեք նշված տարբերակներից մեկը։",
+});

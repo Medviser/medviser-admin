@@ -1,11 +1,17 @@
+"use client"
 import HeadingActions from "@/components/admin/header-actions";
+import type { Specialty } from "@/db/schema";
+import SpecialtiesList from "./list";
 
-export default function SpecialtitesContent(){
+interface SpecialtiesContentProps{
+     specialties: Specialty[]
+}
+export default function SpecialtitesContent({specialties}: SpecialtiesContentProps){
      return (
           <div className="space-y-3">
                <h1 className="font-semibold text-xl md:text-2xl lg:text-3xl">Մասնագիտություններ</h1>
                <HeadingActions href="/specialties/editor"/>
-               <span>TODO: Make each item have a unique view type, unique form page, import/export as JSON & CSV</span>
+               <SpecialtiesList data={specialties}/>
           </div>
      );
 }

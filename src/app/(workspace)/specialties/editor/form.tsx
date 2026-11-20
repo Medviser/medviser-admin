@@ -1,5 +1,5 @@
 "use client";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Plus, Save } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -17,11 +17,16 @@ import type { SpecialtyFormData, SpecialtyFormValues } from "@/lib/types/schema"
 import { specialtySchema } from "@/lib/schemas";
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useTransition } from "react";
+import { createSpecialty, editSpecialty } from "@/actions/specialties";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 type SponsorOption = Pick<typeof sponsors.$inferSelect, "id" | "name">;
 
 type SpecialtyEditorFormProps = {
-     specialty?: Specialty;
+     specialty?: Specialty | null;
      sponsorOptions: SponsorOption[];
      backHref?: string;
 };
@@ -33,6 +38,8 @@ export default function SpecialtyEditorForm({
      sponsorOptions,
      backHref = "/specialties",
 }: SpecialtyEditorFormProps) {
+     const [isSubmitting, startTransition] = useTransition()
+     const router = useRouter()
      const sponsorUntil = specialty?.sponsor_until?.toISOString().slice(0, -1);
      const form = useForm<SpecialtyFormValues, unknown, SpecialtyFormData>({
           resolver: zodResolver(specialtySchema),
@@ -46,7 +53,17 @@ export default function SpecialtyEditorForm({
           },
      });
      const onSubmit = (values: SpecialtyFormData) => {
-          console.log(values)
+          startTransition(async() => {
+               const res = specialty ? await editSpecialty(specialty.id, values) : await createSpecialty(values);
+               if(res.error) {
+                    toast.error(res.error);
+                    return;
+               }
+               if(res.success) {
+                    form.reset();
+                    router.push("/specialties")
+               }
+          })
      }
      return (
           <div className="space-y-4">
@@ -67,6 +84,7 @@ export default function SpecialtyEditorForm({
                               <Controller
                                    control={form.control}
                                    name="name_hy"
+                                   disabled={isSubmitting}
                                    render={({field, fieldState})=>(
                                         <Field data-invalid={fieldState.invalid}>
                                              <FieldLabel htmlFor={field.name}>Անունը հայերեն</FieldLabel>
@@ -83,6 +101,7 @@ export default function SpecialtyEditorForm({
                               <Controller
                                    control={form.control}
                                    name="slug"
+                                   disabled={isSubmitting}
                                    render={({field, fieldState})=>(
                                         <Field data-invalid={fieldState.invalid}>
                                              <FieldLabel htmlFor={field.name}>Հասցեի անվանում (slug)</FieldLabel>
@@ -103,6 +122,7 @@ export default function SpecialtyEditorForm({
                          <Controller
                               control={form.control}
                               name="sort_order"
+                              disabled={isSubmitting}
                               render={({ field, fieldState }) => (
                                    <Field data-invalid={fieldState.invalid}>
                                         <FieldLabel htmlFor={field.name}>Հերթականություն</FieldLabel>
@@ -123,6 +143,7 @@ export default function SpecialtyEditorForm({
                               <Controller
                                    control={form.control}
                                    name="sponsor_id"
+                                   disabled={isSubmitting}
                                    render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
                                              <FieldLabel htmlFor={field.name}>Հովանավոր</FieldLabel>
@@ -158,6 +179,7 @@ export default function SpecialtyEditorForm({
                               <Controller
                                    control={form.control}
                                    name="sponsor_until"
+                                   disabled={isSubmitting}
                                    render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
                                              <FieldLabel htmlFor={field.name}>
@@ -178,6 +200,7 @@ export default function SpecialtyEditorForm({
                          <Controller
                               control={form.control}
                               name="is_published"
+                              disabled={isSubmitting}
                               render={({ field, fieldState }) => (
                                    <Field orientation="horizontal" data-invalid={fieldState.invalid}>
                                         <Switch
@@ -197,7 +220,8 @@ export default function SpecialtyEditorForm({
                     </FieldGroup>
                     <div className="flex justify-end">
                          <Button type="submit">
-                              {specialty ? "Պահպանել" : "Ստեղծել"}
+                              {isSubmitting ? <Spinner/> : specialty ? <Save/> : <Plus/>}
+                              {isSubmitting ? "Խնդրում ենք սպասել․․․" : specialty ? "Պահպանել" : "Ստեղծել"}
                          </Button>
                     </div>
                </form>
