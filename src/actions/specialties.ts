@@ -6,10 +6,10 @@ import { revalidatePath } from "next/cache";
 
 export async function createSpecialty(values: SpecialtyFormData){
      const validated = specialtyDataSchema.safeParse(values);
-     if(!validated.success) {
-          console.error(validated.error)
-          return {error: "Դաշտերը դեռ անվավեր են"}
-     }
+     if (!validated.success) {
+          console.error(validated.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
 
      // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
 
@@ -28,10 +28,10 @@ export async function editSpecialty(id: string, values: SpecialtyFormData){
           return { error: "ID-ն պարտադիր է։" };
      }
      const validated = specialtyDataSchema.safeParse(values);
-     if(!validated.success) {
-          console.error(validated.error)
-          return {error: "Դաշտերը դեռ անվավեր են"}
-     }
+     if (!validated.success) {
+          console.error(validated.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
      // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
 
      try {

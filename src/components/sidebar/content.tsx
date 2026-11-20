@@ -8,6 +8,7 @@ import {
      FolderTree,
      LayoutDashboard,
      TableOfContents,
+     Tags,
      Users,
 } from "lucide-react";
 import {
@@ -40,6 +41,11 @@ const navigationGroups = [
                     title: "Բաժիններ",
                     href: "/sections",
                     icon: TableOfContents
+               },
+               {
+                    title: "Թեմաներ",
+                    href: "/topics",
+                    icon: Tags,
                },
                {
                     title: "Հարցեր",
@@ -87,7 +93,7 @@ export default function AppSidebarList(){
                          <SidebarGroupContent>
                               <SidebarMenu>
                                    {group.items.map((item) => {
-                                        const matchesPath = pathName===item.href
+                                        const matchesPath = pathName === item.href || (item.href !== "/" && pathName.startsWith(`${item.href}/`));
                                         return (
                                              <SidebarMenuItem key={item.href}>
                                                   <SidebarMenuButton

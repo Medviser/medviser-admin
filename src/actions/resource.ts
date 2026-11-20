@@ -10,7 +10,10 @@ type ResourceResult = { success: true } | { error: string };
 
 export async function createResource(values: ResourceFormValues): Promise<ResourceResult> {
      const parsed = resourceSchema.safeParse(values);
-     if (!parsed.success) return { error: "Ստուգեք լրացված դաշտերը։" };
+     if (!parsed.success) {
+          console.error(parsed.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
 
      // TODO: Այստեղ կանչիր ադմինի իրավունքի սերվերային ստուգումը։
 
@@ -30,7 +33,10 @@ export async function editResource(id: string, values: ResourceFormValues): Prom
      }
 
      const parsed = resourceSchema.safeParse(values);
-     if (!parsed.success) return { error: "Ստուգեք լրացված դաշտերը։" };
+     if (!parsed.success) {
+          console.error(parsed.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
 
      // TODO: Այստեղ կանչիր ադմինի իրավունքի սերվերային ստուգումը։
 

@@ -10,7 +10,10 @@ async function saveSection(values: SectionFormValues, id?: string): Promise<{
      success?: boolean
 }> {
      const parsed = sectionSchema.safeParse(values);
-     if (!parsed.success) return { error: "Ստուգեք լրացված դաշտերը։" };
+     if (!parsed.success) {
+          console.error(parsed.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
 
      // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
 

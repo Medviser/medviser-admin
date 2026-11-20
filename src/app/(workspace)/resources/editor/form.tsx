@@ -16,9 +16,11 @@ import { Textarea } from "@/components/ui/textarea";
 import type { Resource } from "@/db/schema";
 import { resourceSchema } from "@/lib/schemas";
 import type { ResourceFormValues } from "@/lib/types/schema";
+import { useTransition } from "react";
 
 export default function ResourceEditorForm({ resource }: { resource?: Resource }) {
      const router = useRouter();
+     const [isSubmitting, startTransition] = useTransition()
      const form = useForm<ResourceFormValues>({
           resolver: zodResolver(resourceSchema),
           defaultValues: {
@@ -29,24 +31,20 @@ export default function ResourceEditorForm({ resource }: { resource?: Resource }
           },
      });
 
-     const { errors, isSubmitting } = form.formState;
-
-     async function onSubmit(values: ResourceFormValues) {
-          try {
-               const result = resource
-                    ? await editResource(resource.id, values)
-                    : await createResource(values);
-
-               if ("error" in result) {
-                    toast.error(result.error);
-                    return;
+     function onSubmit(values: ResourceFormValues) {
+          startTransition(async()=>{
+               try {
+                    const result = resource ? await editResource(resource.id, values) : await createResource(values);
+                    if ("error" in result) {
+                         toast.error(result.error);
+                         return;
+                    }
+                    toast.success(resource ? "Ռեսուրսը պահպանվեց։" : "Ռեսուրսը ստեղծվեց։");
+                    router.push("/resources");
+               } catch {
+                    toast.error("Չհաջողվեց պահպանել ռեսուրսը։");
                }
-
-               toast.success(resource ? "Ռեսուրսը պահպանվեց։" : "Ռեսուրսը ստեղծվեց։");
-               router.push("/resources");
-          } catch {
-               toast.error("Չհաջողվեց պահպանել ռեսուրսը։");
-          }
+          })
      }
 
      return (
@@ -71,37 +69,58 @@ export default function ResourceEditorForm({ resource }: { resource?: Resource }
                >
                     <FieldGroup className="gap-5">
                          <div className="grid gap-5 md:grid-cols-2">
-                              <Field data-invalid={Boolean(errors.title)}>
-                                   <FieldLabel htmlFor="title">Վերնագիր</FieldLabel>
-                                   <Input
-                                        id="title"
-                                        aria-invalid={Boolean(errors.title)}
-                                        {...form.register("title")}
-                                   />
-                                   {errors.title && <FieldError errors={[errors.title]} />}
-                              </Field>
-
-                              <Field data-invalid={Boolean(errors.url)}>
-                                   <FieldLabel htmlFor="url">Հղում</FieldLabel>
-                                   <Input
-                                        id="url"
-                                        type="url"
-                                        placeholder="https://example.com"
-                                        aria-invalid={Boolean(errors.url)}
-                                        {...form.register("url")}
-                                   />
-                                   {errors.url && <FieldError errors={[errors.url]} />}
-                              </Field>
+                              <Controller
+                                   control={form.control}
+                                   name="title"
+                                   disabled={isSubmitting}
+                                   render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                             <FieldLabel htmlFor={field.name}>Վերնագիր</FieldLabel>
+                                             <Input {...field} id={field.name} aria-invalid={fieldState.invalid} />
+                                             {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                        </Field>
+                                   )}
+                              />
+                              <Controller
+                                   control={form.control}
+                                   name="url"
+                                   disabled={isSubmitting}
+                                   render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                             <FieldLabel htmlFor={field.name}>Հղում</FieldLabel>
+                                             <Input
+                                                  {...field}
+                                                  id={field.name}
+                                                  type="url"
+                                                  placeholder="https://example.com"
+                                                  aria-invalid={fieldState.invalid}
+                                             />
+                                        {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                        </Field>
+                                   )}
+                              />
                          </div>
-
-                         <Field>
-                              <FieldLabel htmlFor="description">Նկարագրություն</FieldLabel>
-                              <Textarea id="description" rows={3} {...form.register("description")} />
-                         </Field>
-
+                         <Controller
+                              control={form.control}
+                              name="description"
+                              disabled={isSubmitting}
+                              render={({ field, fieldState }) => (
+                                   <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel htmlFor={field.name}>Նկարագրություն</FieldLabel>
+                                        <Textarea
+                                             {...field}
+                                             id={field.name}
+                                             rows={3}
+                                             aria-invalid={fieldState.invalid}
+                                        />
+                                        {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                   </Field>
+                              )}
+                         />
                          <Controller
                               control={form.control}
                               name="is_published"
+                              disabled={isSubmitting}
                               render={({ field }) => (
                                    <Field orientation="horizontal">
                                         <Switch

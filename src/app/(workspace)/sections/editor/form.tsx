@@ -83,6 +83,7 @@ export default function SectionEditorForm({ section, specialties }: Props) {
           <Controller
             control={form.control}
             name="name_hy"
+            disabled={isPending}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>Բաժնի անունը</FieldLabel>
@@ -99,6 +100,7 @@ export default function SectionEditorForm({ section, specialties }: Props) {
           <Controller
             control={form.control}
             name="specialty_id"
+            disabled={isPending}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>Մասնագիտություն</FieldLabel>
@@ -106,12 +108,14 @@ export default function SectionEditorForm({ section, specialties }: Props) {
                   name={field.name}
                   value={field.value}
                   onValueChange={field.onChange}
+                  disabled={field.disabled}
                 >
                   <SelectTrigger
                     id={field.name}
                     ref={field.ref}
                     onBlur={field.onBlur}
                     aria-invalid={fieldState.invalid}
+                    disabled={field.disabled}
                     className="w-full"
                   >
                     <SelectValue placeholder="Ընտրեք մասնագիտությունը" />
@@ -132,6 +136,7 @@ export default function SectionEditorForm({ section, specialties }: Props) {
           <Controller
             control={form.control}
             name="sort_order"
+            disabled={isPending}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor={field.name}>Հերթականություն</FieldLabel>

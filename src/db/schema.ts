@@ -506,3 +506,4 @@ export type Resource = typeof resources.$inferSelect;
 export type Specialty = typeof specialties.$inferSelect;
 export type NewSpecialty = typeof specialties.$inferInsert;
 export type Section = typeof sections.$inferSelect
+export type Topic = typeof topics.$inferSelect;

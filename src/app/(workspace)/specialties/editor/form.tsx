@@ -59,7 +59,6 @@ export default function SpecialtyEditorForm({
                     toast.error(res.error);
                     return;
                }
-
                toast.success(specialty ? "Մասնագիտությունը պահպանվեց։" : "Մասնագիտությունը ստեղծվեց։");
                router.push("/specialties")
           })
@@ -156,6 +155,7 @@ export default function SpecialtyEditorForm({
                                                        id={field.name}
                                                        onBlur={field.onBlur}
                                                        aria-invalid={fieldState.invalid}
+                                                       disabled={field.disabled}
                                                        className="w-full"
                                                   >
                                                        <SelectValue />

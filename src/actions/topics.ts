@@ -1,0 +1,68 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { deleteTopic, insertTopic, updateTopic } from "@/data/topics";
+import { topicSchema } from "@/lib/schemas";
+import type { TopicFormValues } from "@/lib/types/schema";
+
+export async function createTopic(values: TopicFormValues) {
+     const parsed = topicSchema.safeParse(values);
+     if (!parsed.success) {
+          console.error(parsed.error)
+          return { error: "Ստուգեք թեմայի անունն ու մասնագիտությունը։" };
+     }
+     // TODO: Այստեղ կանչիր ադմինի իրավունքի սերվերային ստուգումը։
+
+     try {
+          await insertTopic(parsed.data);
+     } catch {
+          return { error: "Չհաջողվեց ստեղծել թեման։" };
+     }
+
+     revalidatePath("/topics");
+     revalidatePath("/questions/editor");
+     return { success: true };
+}
+
+export async function editTopic(id: string, values: TopicFormValues) {
+     const parsed = topicSchema.safeParse(values);
+     if (!parsed.success) {
+          console.error(parsed.error)
+          return { error: "Մուտքագրեք թեմայի անունը։" };
+     }
+     // TODO: Այստեղ կանչիր ադմինի իրավունքի սերվերային ստուգումը։
+
+     try {
+          const updated = await updateTopic(id, parsed.data.name_hy) 
+          if (!updated) return { error: "Թեման չի գտնվել։" };
+     } catch {
+          return { error: "Չհաջողվեց պահպանել թեման։" };
+     }
+
+     revalidatePath("/topics");
+     revalidatePath("/questions/editor");
+     return { success: true };
+}
+
+export async function removeTopic(id: string) {
+     try {
+          if (!(await deleteTopic(id))) {
+               return { error: "Թեման չի գտնվել։" };
+          }
+     } catch (error) {
+          // TODO: Այստեղ կանչիր ադմինի իրավունքի սերվերային ստուգումը։
+          // Drizzle-ը PostgreSQL-ի սխալը կարող է պահել `cause`-ում։
+          const cause = error instanceof Error ? error.cause ?? error : error;
+          if (
+               cause &&
+               typeof cause === "object" &&
+               "code" in cause &&
+               cause.code === "23503"
+          ) {
+               return { error: "Թեման կցված է հարցերի։ Նախ հեռացրեք այդ կապերը։" };
+          }
+          return { error: "Չհաջողվեց ջնջել թեման։" };
+     }
+     revalidatePath("/topics");
+     revalidatePath("/questions/editor");
+     return { success: true };
+}

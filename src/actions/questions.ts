@@ -6,13 +6,10 @@ import { revalidatePath } from "next/cache";
 
 export async function createQuestion(values: QuestionFormValues){
      const validated = questionSchema.safeParse(values);
-     if(!validated.success) {
-          console.error(validated.error)
-          return {error: "Դաշտերը դեռ անվավեր են"}
-     }
-
-     
-
+     if (!validated.success) {
+          console.error(validated.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
      try {
           await insertQuestion(validated.data);
           return { success: true };
@@ -26,7 +23,10 @@ export async function editQuestion(id: string, values: QuestionFormValues) {
      }
 
      const parsed = questionSchema.safeParse(values);
-     if (!parsed.success) return { error: "Ստուգեք լրացված դաշտերը։" };
+     if (!parsed.success) {
+          console.error(parsed.error);
+          return { error: "Ստուգեք լրացված դաշտերը։" }
+     };
 
      // TODO: Այստեղ միացրու ադմինի իրավունքի սերվերային ստուգումը։
 

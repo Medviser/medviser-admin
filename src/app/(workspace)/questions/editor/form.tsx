@@ -109,6 +109,7 @@ export default function QuestionsEditorForm({
                               <Controller
                                    control={form.control}
                                    name="specialty_id"
+                                   disabled={isSubmitting}
                                    render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
                                              <FieldLabel htmlFor={field.name}>Մասնագիտություն</FieldLabel>
@@ -120,12 +121,14 @@ export default function QuestionsEditorForm({
                                                        form.setValue("section_id", "", { shouldDirty: true });
                                                        form.setValue("topic_ids", [], { shouldDirty: true });
                                                   }}
+                                                  disabled={field.disabled}
                                              >
                                                   <SelectTrigger
                                                        id={field.name}
                                                        ref={field.ref}
                                                        onBlur={field.onBlur}
                                                        aria-invalid={fieldState.invalid}
+                                                       disabled={field.disabled}
                                                        className="w-full"
                                                   >
                                                        <SelectValue placeholder="Ընտրեք մասնագիտությունը" />
@@ -142,23 +145,24 @@ export default function QuestionsEditorForm({
                                         </Field>
                                    )}
                               />
-
                               <Controller
                                    control={form.control}
                                    name="section_id"
+                                   disabled={isSubmitting || !specialtyId}
                                    render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
                                              <FieldLabel htmlFor={field.name}>Բաժին</FieldLabel>
                                              <Select
                                                   value={field.value}
                                                   onValueChange={field.onChange}
-                                                  disabled={!specialtyId}
+                                                  disabled={field.disabled}
                                              >
                                                   <SelectTrigger
                                                        id={field.name}
                                                        ref={field.ref}
                                                        onBlur={field.onBlur}
                                                        aria-invalid={fieldState.invalid}
+                                                       disabled={field.disabled}
                                                        className="w-full"
                                                   >
                                                        <SelectValue placeholder="Ընտրեք բաժինը" />
@@ -175,25 +179,33 @@ export default function QuestionsEditorForm({
                                         </Field>
                                    )}
                               />
-
-                              <Field data-invalid={Boolean(errors.number)}>
-                                   <FieldLabel htmlFor="number">Հարցի համարը</FieldLabel>
-                                   <Input
-                                        id="number"
-                                        type="number"
-                                        min={1}
-                                        step={1}
-                                        aria-invalid={Boolean(errors.number)}
-                                        {...form.register("number", { valueAsNumber: true })}
-                                   />
-                                   {errors.number && <FieldError errors={[errors.number]} />}
-                              </Field>
+                              <Controller
+                                   control={form.control}
+                                   name="number"
+                                   disabled={isSubmitting}
+                                   render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                             <FieldLabel htmlFor={field.name}>Հարցի համարը</FieldLabel>
+                                             <Input
+                                                  {...field}
+                                                  id={field.name}
+                                                  type="number"
+                                                  min={1}
+                                                  step={1}
+                                                  value={Number.isNaN(field.value) ? "" : field.value}
+                                                  onChange={(event) => field.onChange(event.currentTarget.valueAsNumber)}
+                                                  aria-invalid={fieldState.invalid}
+                                             />
+                                             {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                        </Field>
+                                   )}
+                              />
                          </div>
-
                          {visibleTopics.length > 0 && (
                               <Controller
                                    control={form.control}
                                    name="topic_ids"
+                                   disabled={isSubmitting}
                                    render={({ field }) => (
                                         <fieldset className="space-y-2">
                                              <legend className="text-sm font-medium">Թեմաներ</legend>
@@ -221,82 +233,140 @@ export default function QuestionsEditorForm({
                               />
                          )}
 
-                         <Field data-invalid={Boolean(errors.stem)}>
-                              <FieldLabel htmlFor="stem">Հարցի տեքստը</FieldLabel>
-                              <Textarea id="stem" rows={3} {...form.register("stem")} />
-                              {errors.stem && <FieldError errors={[errors.stem]} />}
-                         </Field>
-
-                         <fieldset className="space-y-3">
-                              <legend className="text-sm font-medium">
-                                   Պատասխանների տարբերակներ և ճիշտ պատասխան
-                              </legend>
-                              {options.map((option, index) => {
-                                   const error = errors.options?.[index]?.text;
-
-                                   return (
-                                        <Field key={option.id} data-invalid={Boolean(error)}>
-                                             <div className="flex items-center gap-3">
-                                                  <input
-                                                       type="radio"
-                                                       value={option.id}
-                                                       aria-label={`${letters[index]} տարբերակը ճիշտ է`}
-                                                       {...form.register("correct_option_id")}
-                                                  />
-                                                  <FieldLabel htmlFor={`option-${option.id}`}>
-                                                       {letters[index]}
-                                                  </FieldLabel>
-                                                  <Input
-                                                       id={`option-${option.id}`}
-                                                       aria-invalid={Boolean(error)}
-                                                       {...form.register(`options.${index}.text`)}
-                                                  />
-                                             </div>
-                                             {error && <FieldError errors={[error]} />}
-                                        </Field>
-                                   );
-                              })}
-                              {errors.correct_option_id && (
-                                   <FieldError errors={[errors.correct_option_id]} />
+                         <Controller
+                              control={form.control}
+                              name="stem"
+                              disabled={isSubmitting}
+                              render={({ field, fieldState }) => (
+                                   <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel htmlFor={field.name}>Հարցի տեքստը</FieldLabel>
+                                        <Textarea
+                                             {...field}
+                                             id={field.name}
+                                             rows={3}
+                                             aria-invalid={fieldState.invalid}
+                                        />
+                                        {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                   </Field>
                               )}
-                         </fieldset>
+                         />
 
-                         <Field data-invalid={Boolean(errors.explanation)}>
-                              <FieldLabel htmlFor="explanation">Հիմնավորում</FieldLabel>
-                              <Textarea id="explanation" rows={4} {...form.register("explanation")} />
-                              {errors.explanation && <FieldError errors={[errors.explanation]} />}
-                         </Field>
-
-                         <Field>
-                              <FieldLabel htmlFor="note">Նշում</FieldLabel>
-                              <Textarea id="note" rows={2} {...form.register("note")} />
-                         </Field>
-
+                         <Controller
+                              control={form.control}
+                              name="correct_option_id"
+                              disabled={isSubmitting}
+                              render={({ field: correct, fieldState: correctState }) => (
+                                   <fieldset className="space-y-3">
+                                        <legend className="text-sm font-medium">
+                                             Պատասխանների տարբերակներ և ճիշտ պատասխան
+                                        </legend>
+                                        {options.map((option, index) => (
+                                             <Controller
+                                                  key={option.id}
+                                                  control={form.control}
+                                                  disabled={isSubmitting}
+                                                  name={`options.${index}.text`}
+                                                  render={({ field, fieldState }) => (
+                                                       <Field data-invalid={fieldState.invalid}>
+                                                            <div className="flex items-center gap-3">
+                                                                 <input
+                                                                      ref={index === 0 ? correct.ref : undefined}
+                                                                      type="radio"
+                                                                      name={correct.name}
+                                                                      value={option.id}
+                                                                      checked={correct.value === option.id}
+                                                                      onChange={() => correct.onChange(option.id)}
+                                                                      onBlur={correct.onBlur}
+                                                                      aria-invalid={correctState.invalid}
+                                                                      aria-label={`${letters[index]} տարբերակը ճիշտ է`}
+                                                                 />
+                                                                 <FieldLabel htmlFor={`option-${option.id}`}>{letters[index]}</FieldLabel>
+                                                                 <Input
+                                                                      {...field}
+                                                                      id={`option-${option.id}`}
+                                                                      aria-invalid={fieldState.invalid}
+                                                                 />
+                                                            </div>
+                                                            {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                                       </Field>
+                                                  )}
+                                             />
+                                        ))}
+                                        {correctState.error && <FieldError errors={[correctState.error]} />}
+                                   </fieldset>
+                              )}
+                         />
+                         <Controller
+                              control={form.control}
+                              name="explanation"
+                              disabled={isSubmitting}
+                              render={({ field, fieldState }) => (
+                                   <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel htmlFor={field.name}>Հիմնավորում</FieldLabel>
+                                        <Textarea
+                                             {...field}
+                                             id={field.name}
+                                             rows={4}
+                                             aria-invalid={fieldState.invalid}
+                                        />
+                                        {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                   </Field>
+                              )}
+                         />
+                         <Controller
+                              control={form.control}
+                              name="note"
+                              disabled={isSubmitting}
+                              render={({ field, fieldState }) => (
+                                   <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel htmlFor={field.name}>Նշում</FieldLabel>
+                                        <Textarea
+                                             {...field}
+                                             id={field.name}
+                                             rows={2}
+                                             aria-invalid={fieldState.invalid}
+                                        />
+                                        {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                   </Field>
+                              )}
+                         />
                          <fieldset className="space-y-3">
                               <legend className="text-sm font-medium">Աղբյուրներ</legend>
                               {sources.map((source, index) => (
                                    <div key={source.id} className="grid items-start gap-3 md:grid-cols-[1fr_1fr_auto]">
-                                        <Field>
-                                             <FieldLabel htmlFor={`source-${index}-title`}>Անուն</FieldLabel>
-                                             <Input
-                                                  id={`source-${index}-title`}
-                                                  {...form.register(`sources.${index}.title`)}
-                                             />
-                                             {errors.sources?.[index]?.title && (
-                                                  <FieldError errors={[errors.sources[index].title]} />
+                                        <Controller
+                                             control={form.control}
+                                             disabled={isSubmitting}
+                                             name={`sources.${index}.title`}
+                                             render={({ field, fieldState }) => (
+                                                  <Field data-invalid={fieldState.invalid}>
+                                                       <FieldLabel htmlFor={`source-${source.id}-title`}>Անուն</FieldLabel>
+                                                       <Input
+                                                            {...field}
+                                                            id={`source-${source.id}-title`}
+                                                            aria-invalid={fieldState.invalid}
+                                                       />
+                                                       {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                                  </Field>
                                              )}
-                                        </Field>
-                                        <Field>
-                                             <FieldLabel htmlFor={`source-${index}-url`}>Հղում</FieldLabel>
-                                             <Input
-                                                  id={`source-${index}-url`}
-                                                  type="url"
-                                                  {...form.register(`sources.${index}.url`)}
-                                             />
-                                             {errors.sources?.[index]?.url && (
-                                                  <FieldError errors={[errors.sources[index].url]} />
+                                        />
+                                        <Controller
+                                             control={form.control}
+                                             name={`sources.${index}.url`}
+                                             disabled={isSubmitting}
+                                             render={({ field, fieldState }) => (
+                                                  <Field data-invalid={fieldState.invalid}>
+                                                       <FieldLabel htmlFor={`source-${source.id}-url`}>Հղում</FieldLabel>
+                                                       <Input
+                                                            {...field}
+                                                            id={`source-${source.id}-url`}
+                                                            type="url"
+                                                            aria-invalid={fieldState.invalid}
+                                                       />
+                                                       {fieldState.error && <FieldError errors={[fieldState.error]} />}
+                                                  </Field>
                                              )}
-                                        </Field>
+                                        />
                                         <Button type="button" variant="outline" onClick={() => remove(index)}>
                                              Հեռացնել
                                         </Button>
@@ -310,10 +380,10 @@ export default function QuestionsEditorForm({
                                    Ավելացնել աղբյուր
                               </Button>
                          </fieldset>
-
                          <Controller
                               control={form.control}
                               name="shuffle"
+                              disabled={isSubmitting}
                               render={({ field }) => (
                                    <Field orientation="horizontal">
                                         <Switch
@@ -328,7 +398,6 @@ export default function QuestionsEditorForm({
                               )}
                          />
                     </FieldGroup>
-
                     {errors.root?.save && <FieldError errors={[errors.root.save]} />}
                     <div className="flex justify-end">
                          <Button type="submit" disabled={isSubmitting}>

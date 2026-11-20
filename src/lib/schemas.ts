@@ -102,3 +102,8 @@ export const sectionSchema = z.object({
      specialty_id: z.string().trim().min(1, "Ընտրեք մասնագիտությունը։"),
      sort_order: z.int32({ error: "Մուտքագրեք թույլատրելի միջակայքում գտնվող ամբողջ թիվ։" }),
 });
+
+export const topicSchema = z.object({
+     name_hy: z.string().trim().min(1, "Մուտքագրեք թեմայի անունը։"),
+     specialty_id: z.string().trim().min(1, "Ընտրեք մասնագիտությունը։"),
+});
