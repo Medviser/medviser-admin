@@ -8,6 +8,7 @@ import {
   index,
   integer,
   json,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -33,6 +34,13 @@ export type QuestionSource = { title: string; url: string };
 
 const cuidPrimaryKey = () => text().primaryKey().$defaultFn(createId);
 const dateTime = () => timestamp({ withTimezone: true, precision: 3, mode: "date" });
+
+export const userRole = pgEnum("user_role", [
+  "user",
+  "content_editor",
+  "reviewer",
+  "super_admin",
+]);
 
 export const sponsors = pgTable("sponsors", {
   id: cuidPrimaryKey(),
@@ -124,6 +132,7 @@ export const users = pgTable(
     created_at: dateTime().notNull().defaultNow(),
     consent_terms_at: dateTime().notNull(),
     consent_marketing: boolean().notNull().default(false),
+    role: userRole("role").notNull().default("user"),
   },
   (table) => [
     foreignKey({
