@@ -35,6 +35,7 @@ export default function HeadingActions({href, onCreate}: HeadingActionsProps){
                               Ստեղծել
                          </Button>
                     )}
+                    {/* TODO: Ավելացնել Դրա հնարավորությունները 5 Ռեսուրսներում */}
                     <ButtonGroup>
                          <Button size="icon" variant="outline" title="Ներմուծել">
                               <Upload/>
